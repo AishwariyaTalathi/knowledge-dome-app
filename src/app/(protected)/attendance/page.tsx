@@ -4,57 +4,49 @@ import { AttendanceMarker } from '@/components/attendance/AttendanceMarker'
 export default async function AttendancePage({
   searchParams,
 }: {
-  searchParams: Promise<{ batch_id?: string; date?: string }>
+  searchParams: Promise<{ date?: string }>
 }) {
-  const { batch_id, date } = await searchParams
+  const { date } = await searchParams
   const supabase = await createClient()
-  const today = new Date().toISOString().split('T')[0]
+
+  // Default to today in IST
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
   const selectedDate = date ?? today
 
-  const { data: batches } = await supabase
-    .from('batches')
-    .select('id, name, class_type')
-    .eq('is_active', true)
-    .order('name')
-
-  let students = null
-  let existingRecords: Record<string, boolean> = {}
-
-  if (batch_id) {
-    const { data: studentData } = await supabase
+  const [{ data: students }, { data: records }] = await Promise.all([
+    supabase
       .from('students')
-      .select('id, first_name, last_name, grade')
-      .eq('batch_id', batch_id)
+      .select('id, first_name, last_name, grade, batch_id, batches(id, name, class_type)')
       .eq('is_active', true)
-      .order('first_name')
+      .order('first_name'),
+    supabase
+      .from('attendance_records')
+      .select('student_id, present')
+      .eq('class_date', selectedDate),
+  ])
 
-    students = studentData
+  const existingRecords: Record<string, boolean> = Object.fromEntries(
+    (records ?? []).map((r) => [r.student_id, r.present])
+  )
 
-    if (students && students.length > 0) {
-      const { data: records } = await supabase
-        .from('attendance_records')
-        .select('student_id, present')
-        .eq('class_date', selectedDate)
-        .in('student_id', students.map((s) => s.id))
-
-      existingRecords = Object.fromEntries(
-        (records ?? []).map((r) => [r.student_id, r.present])
-      )
-    }
-  }
+  // Sort by batch name then first name
+  const sorted = (students ?? []).sort((a, b) => {
+    const ba = (a.batches as unknown as { name: string } | null)?.name ?? 'zzz'
+    const bb = (b.batches as unknown as { name: string } | null)?.name ?? 'zzz'
+    return ba !== bb ? ba.localeCompare(bb) : a.first_name.localeCompare(b.first_name)
+  })
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mark Attendance</h1>
-        <p className="text-sm text-gray-500 mt-1">Select a batch and date, then mark each student.</p>
+      <div className="mb-5">
+        <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
+        <p className="text-sm text-gray-500 mt-1">Tap a student to mark — saves instantly.</p>
       </div>
       <AttendanceMarker
-        batches={batches ?? []}
-        students={students}
+        students={sorted as any}
         existingRecords={existingRecords}
-        selectedBatchId={batch_id ?? ''}
         selectedDate={selectedDate}
+        today={today}
       />
     </div>
   )

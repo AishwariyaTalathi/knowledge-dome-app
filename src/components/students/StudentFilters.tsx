@@ -4,13 +4,8 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
 import { Search, X } from 'lucide-react'
 import { CLASS_TYPES } from '@/lib/constants'
-import type { Batch } from '@/types/database'
 
-interface StudentFiltersProps {
-  batches: Batch[]
-}
-
-export function StudentFilters({ batches }: StudentFiltersProps) {
+export function StudentFilters() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -18,22 +13,14 @@ export function StudentFilters({ batches }: StudentFiltersProps) {
   const updateParam = useCallback(
     (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set(key, value)
-      } else {
-        params.delete(key)
-      }
+      if (value) params.set(key, value)
+      else params.delete(key)
       router.push(`${pathname}?${params.toString()}`)
     },
     [router, pathname, searchParams]
   )
 
-  const hasFilters =
-    searchParams.get('search') || searchParams.get('batch') || searchParams.get('class_type')
-
-  const clearFilters = () => {
-    router.push(pathname)
-  }
+  const hasFilters = searchParams.get('search') || searchParams.get('class_type')
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
@@ -52,7 +39,7 @@ export function StudentFilters({ batches }: StudentFiltersProps) {
 
         {/* Class type filter */}
         <select
-          defaultValue={searchParams.get('class_type') ?? ''}
+          value={searchParams.get('class_type') ?? ''}
           onChange={(e) => updateParam('class_type', e.target.value)}
           className="text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-800 bg-white"
         >
@@ -62,21 +49,9 @@ export function StudentFilters({ batches }: StudentFiltersProps) {
           ))}
         </select>
 
-        {/* Batch filter */}
-        <select
-          defaultValue={searchParams.get('batch') ?? ''}
-          onChange={(e) => updateParam('batch', e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-800 bg-white"
-        >
-          <option value="">All Batches</option>
-          {batches.map((b) => (
-            <option key={b.id} value={b.id}>{b.name}</option>
-          ))}
-        </select>
-
         {hasFilters && (
           <button
-            onClick={clearFilters}
+            onClick={() => router.push(pathname)}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 px-3 py-2.5"
           >
             <X size={14} />
