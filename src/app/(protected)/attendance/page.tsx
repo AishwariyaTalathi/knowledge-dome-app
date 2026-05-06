@@ -1,6 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { AttendanceMarker } from '@/components/attendance/AttendanceMarker'
 
+type AttendanceStudent = {
+  id: string
+  first_name: string
+  last_name: string
+  grade: string | null
+  batch_id: string | null
+  batches: { id: string; name: string; class_type: string } | null
+}
+
 export default async function AttendancePage({
   searchParams,
 }: {
@@ -9,7 +18,6 @@ export default async function AttendancePage({
   const { date } = await searchParams
   const supabase = await createClient()
 
-  // Default to today in IST
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
   const selectedDate = date ?? today
 
@@ -29,10 +37,9 @@ export default async function AttendancePage({
     (records ?? []).map((r) => [r.student_id, r.present])
   )
 
-  // Sort by batch name then first name
-  const sorted = (students ?? []).sort((a, b) => {
-    const ba = (a.batches as unknown as { name: string } | null)?.name ?? 'zzz'
-    const bb = (b.batches as unknown as { name: string } | null)?.name ?? 'zzz'
+  const sorted = (students as unknown as AttendanceStudent[] ?? []).sort((a, b) => {
+    const ba = a.batches?.name ?? 'zzz'
+    const bb = b.batches?.name ?? 'zzz'
     return ba !== bb ? ba.localeCompare(bb) : a.first_name.localeCompare(b.first_name)
   })
 
@@ -43,7 +50,7 @@ export default async function AttendancePage({
         <p className="text-sm text-gray-500 mt-1">Tap a student to mark — saves instantly.</p>
       </div>
       <AttendanceMarker
-        students={sorted as any}
+        students={sorted}
         existingRecords={existingRecords}
         selectedDate={selectedDate}
         today={today}
