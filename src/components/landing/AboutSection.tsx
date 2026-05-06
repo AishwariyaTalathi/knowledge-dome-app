@@ -5,7 +5,7 @@ const TAGS = [
   'Jolly Phonics Certified',
   'Academic Grammar',
   'Spoken English',
-  '10+ Years Experience',
+  '20+ Years Experience',
 ]
 
 const GALLERY: { src: string; alt: string }[] = [
@@ -62,7 +62,7 @@ export function AboutSection() {
               English Language Educator · Pune
             </p>
             <p className="text-gray-600 leading-relaxed mb-5">
-              A doctor by profession and an educator by passion, Minakshi has spent over 10 years
+              A doctor by profession and an educator by passion, Minakshi has spent over 20 years
               helping children and adults speak English with confidence. What began as a warm,
               in-person class in Pune evolved through the pandemic into a thriving online and offline
               institution — bringing her teaching to students across different cities, countries, and

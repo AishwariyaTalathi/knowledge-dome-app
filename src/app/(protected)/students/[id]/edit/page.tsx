@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { StudentForm } from '@/components/students/StudentForm'
 import type { StudentFormData } from '@/lib/validations'
 
@@ -30,6 +31,7 @@ export default async function EditStudentPage({ params }: { params: Promise<{ id
       notes: data.notes || null,
     }
     const { error } = await supabase.from('students').update(payload).eq('id', id)
+    if (!error) revalidatePath('/students')
     return { error: error?.message }
   }
 

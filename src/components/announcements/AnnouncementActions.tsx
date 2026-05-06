@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { Plus, Bell } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import toast from 'react-hot-toast'
@@ -15,6 +13,11 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { announcementSchema, type AnnouncementFormData } from '@/lib/validations'
 import { formatDate } from '@/lib/utils'
+import {
+  createAnnouncement,
+  updateAnnouncement,
+  toggleAnnouncementVisibility,
+} from '@/app/(protected)/announcements/actions'
 import type { Announcement } from '@/types/database'
 
 function AnnouncementModal({
@@ -86,38 +89,27 @@ function AnnouncementModal({
 }
 
 export function AnnouncementActions({ announcements }: { announcements: Announcement[] }) {
-  const router = useRouter()
   const [addOpen, setAddOpen] = useState(false)
   const [editItem, setEditItem] = useState<Announcement | null>(null)
   const [hideTarget, setHideTarget] = useState<Announcement | null>(null)
 
   const handleAdd = async (data: AnnouncementFormData) => {
-    const supabase = createClient()
-    const { error } = await supabase.from('announcements').insert({
-      ...data,
-      description: data.description || null,
-    })
-    if (!error) router.refresh()
-    return { error: error?.message }
+    return createAnnouncement(data)
   }
 
   const handleEdit = async (data: AnnouncementFormData) => {
     if (!editItem) return { error: 'No announcement selected' }
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('announcements')
-      .update({ ...data, description: data.description || null })
-      .eq('id', editItem.id)
-    if (!error) router.refresh()
-    return { error: error?.message }
+    return updateAnnouncement(editItem.id, data)
   }
 
   const confirmHide = async () => {
     if (!hideTarget) return
-    const supabase = createClient()
-    await supabase.from('announcements').update({ is_active: false }).eq('id', hideTarget.id)
+    await toggleAnnouncementVisibility(hideTarget.id, hideTarget.is_active)
     setHideTarget(null)
-    router.refresh()
+  }
+
+  const handleToggleShow = async (a: Announcement) => {
+    await toggleAnnouncementVisibility(a.id, a.is_active)
   }
 
   return (
@@ -150,11 +142,7 @@ export function AnnouncementActions({ announcements }: { announcements: Announce
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => a.is_active ? setHideTarget(a) : (async () => {
-                    const supabase = createClient()
-                    await supabase.from('announcements').update({ is_active: true }).eq('id', a.id)
-                    router.refresh()
-                  })()}
+                  onClick={() => a.is_active ? setHideTarget(a) : handleToggleShow(a)}
                 >
                   {a.is_active ? 'Hide' : 'Show'}
                 </Button>

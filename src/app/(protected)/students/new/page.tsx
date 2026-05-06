@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { StudentForm } from '@/components/students/StudentForm'
 import type { StudentFormData } from '@/lib/validations'
 
@@ -26,6 +27,7 @@ export default async function NewStudentPage() {
       notes: data.notes || null,
     }
     const { error } = await supabase.from('students').insert(payload)
+    if (!error) revalidatePath('/students')
     return { error: error?.message }
   }
 

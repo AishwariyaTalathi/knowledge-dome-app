@@ -3,31 +3,27 @@
 import { useState } from 'react'
 import { Plus, BookOpen } from 'lucide-react'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { BatchModal } from './BatchModal'
+import { createBatch, updateBatch } from '@/app/(protected)/batches/actions'
 import type { Batch } from '@/types/database'
 import type { BatchFormData } from '@/lib/validations'
 
 export function BatchActions({ batches }: { batches: Batch[] }) {
-  const router = useRouter()
   const [addOpen, setAddOpen] = useState(false)
   const [editBatch, setEditBatch] = useState<Batch | null>(null)
 
   const handleAdd = async (data: BatchFormData) => {
-    const supabase = createClient()
-    const { error } = await supabase.from('batches').insert(data)
-    if (!error) router.refresh()
-    return { error: error?.message }
+    const result = await createBatch(data)
+    if (!result.error) setAddOpen(false)
+    return result
   }
 
   const handleEdit = async (data: BatchFormData) => {
     if (!editBatch) return { error: 'No batch selected' }
-    const supabase = createClient()
-    const { error } = await supabase.from('batches').update(data).eq('id', editBatch.id)
-    if (!error) router.refresh()
-    return { error: error?.message }
+    const result = await updateBatch(editBatch.id, data)
+    if (!result.error) setEditBatch(null)
+    return result
   }
 
   return (

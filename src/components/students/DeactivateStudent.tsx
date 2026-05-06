@@ -1,11 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { createClient } from '@/lib/supabase/client'
+import { toggleStudentActive } from '@/app/(protected)/students/actions'
 
 interface DeactivateStudentProps {
   studentId: string
@@ -14,22 +13,15 @@ interface DeactivateStudentProps {
 }
 
 export function DeactivateStudent({ studentId, studentName, isActive }: DeactivateStudentProps) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   const handleConfirm = async () => {
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('students')
-      .update({ is_active: !isActive })
-      .eq('id', studentId)
-
+    const result = await toggleStudentActive(studentId, isActive)
     setOpen(false)
-    if (error) {
+    if (result.error) {
       toast.error('Something went wrong')
     } else {
       toast.success(isActive ? `${studentName} has been deactivated` : `${studentName} is now active`)
-      router.refresh()
     }
   }
 
