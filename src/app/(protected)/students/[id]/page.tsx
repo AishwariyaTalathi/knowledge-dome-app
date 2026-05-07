@@ -1,13 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MessageCircle, Pencil, ArrowLeft, Phone, Mail } from 'lucide-react'
+import { Pencil, ArrowLeft, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { AttendanceDots } from '@/components/students/AttendanceDots'
 import { FeeStatusBadge } from '@/components/students/FeeStatusBadge'
 import { DeactivateStudent } from '@/components/students/DeactivateStudent'
+import { WhatsAppButton } from '@/components/students/WhatsAppButton'
+import { PhoneButton } from '@/components/students/PhoneButton'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { whatsappLink, formatDate, formatCurrency, getInitials } from '@/lib/utils'
+import { formatDate, formatCurrency, getInitials } from '@/lib/utils'
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   if (!value) return null
@@ -96,10 +98,10 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             <InfoRow
               label="Phone"
               value={
-                <a href={`tel:${student.phone}`} className="flex items-center gap-1 text-brand-800 hover:underline">
-                  <Phone size={13} />
-                  {student.phone}
-                </a>
+                <PhoneButton
+                  number={student.phone}
+                  name={`${student.first_name} ${student.last_name}`}
+                />
               }
             />
           )}
@@ -117,15 +119,11 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
           {contactNumber && (
             <div className="mt-4">
-              <a
-                href={whatsappLink(contactNumber)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
-              >
-                <MessageCircle size={16} />
-                WhatsApp
-              </a>
+              <WhatsAppButton
+                number={contactNumber}
+                name={`${student.first_name} ${student.last_name}`}
+                variant="full"
+              />
             </div>
           )}
         </div>

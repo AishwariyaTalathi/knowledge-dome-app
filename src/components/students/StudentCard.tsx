@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FeeStatusButton } from './FeeStatusButton'
+import { WhatsAppButton } from './WhatsAppButton'
 import { cn, getInitials } from '@/lib/utils'
 import type { Student } from '@/types/database'
 
@@ -24,9 +25,18 @@ export function StudentCard({ student }: { student: Student }) {
           </p>
         </div>
       </Link>
-      <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <FeeStatusButton studentId={student.id} status={student.fee_status} />
-        <span className="text-xs text-gray-400">{student.attendance_pct ?? 0}% att.</span>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {(student.whatsapp_number || student.phone) && (
+          <WhatsAppButton
+            number={(student.whatsapp_number || student.phone)!}
+            name={name}
+            variant="icon"
+          />
+        )}
+        <div className="flex flex-col items-end gap-1">
+          <FeeStatusButton studentId={student.id} status={student.fee_status} />
+          <span className="text-xs text-gray-400">{student.attendance_pct ?? 0}% att.</span>
+        </div>
       </div>
     </div>
   )

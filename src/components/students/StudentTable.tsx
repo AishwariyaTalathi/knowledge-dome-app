@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { FeeStatusButton } from './FeeStatusButton'
+import { WhatsAppButton } from './WhatsAppButton'
 import { cn, getInitials } from '@/lib/utils'
 import type { Student } from '@/types/database'
 
@@ -37,6 +38,13 @@ export function StudentTable({ students }: { students: Student[] }) {
                     </p>
                     {student.phone && <p className="text-xs text-gray-400">{student.phone}</p>}
                   </div>
+                  {(student.whatsapp_number || student.phone) && (
+                    <WhatsAppButton
+                      number={(student.whatsapp_number || student.phone)!}
+                      name={`${student.first_name} ${student.last_name}`}
+                      variant="icon"
+                    />
+                  )}
                 </Link>
               </td>
               <td className="px-4 py-3 text-gray-600">{student.batches?.name ?? '—'}</td>
