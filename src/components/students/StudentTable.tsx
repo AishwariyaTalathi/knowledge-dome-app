@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FeeStatusBadge } from './FeeStatusBadge'
+import { FeeStatusButton } from './FeeStatusButton'
 import { cn, getInitials } from '@/lib/utils'
 import type { Student } from '@/types/database'
 
@@ -43,7 +43,7 @@ export function StudentTable({ students }: { students: Student[] }) {
               <td className="px-4 py-3 text-gray-600">{student.grade ?? '—'}</td>
               <td className="px-4 py-3 text-gray-600">{student.attendance_pct ?? 0}%</td>
               <td className="px-4 py-3">
-                <FeeStatusBadge status={student.fee_status} />
+                <FeeStatusButton studentId={student.id} status={student.fee_status} />
               </td>
             </tr>
           ))}
