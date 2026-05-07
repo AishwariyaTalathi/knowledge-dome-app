@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { GraduationCap } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -32,8 +34,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-800 mb-4">
-            <GraduationCap size={28} className="text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm border border-gray-100 mb-4">
+            <Image src="/images/logo.png" alt="Knowledge Dome" width={44} height={44} className="rounded-full" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Knowledge Dome</h1>
           <p className="text-gray-500 text-sm mt-1">Admin Login</p>
@@ -63,6 +65,13 @@ export default function LoginPage() {
             Sign In
           </Button>
         </form>
+
+        <div className="text-center mt-5">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors">
+            <ArrowLeft size={14} />
+            Back to website
+          </Link>
+        </div>
       </div>
     </div>
   )
