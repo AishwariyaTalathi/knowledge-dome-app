@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { StudentTable } from '@/components/students/StudentTable'
 import { StudentCard } from '@/components/students/StudentCard'
 import { StudentFilters } from '@/components/students/StudentFilters'
+import { InactiveStudentsSection } from '@/components/students/InactiveStudentsSection'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Spinner } from '@/components/ui/Spinner'
@@ -17,7 +18,7 @@ interface SearchParams {
   fee_status?: string
 }
 
-async function getStudents(params: SearchParams): Promise<Student[]> {
+async function getStudents(params: SearchParams): Promise<{ active: Student[]; inactive: Student[] }> {
   const supabase = await createClient()
   let query = supabase
     .from('students')
@@ -34,16 +35,24 @@ async function getStudents(params: SearchParams): Promise<Student[]> {
   }
   if (params.fee_status) query = query.eq('fee_status', params.fee_status)
 
-  const { data } = await query
-  const students = (data as Student[]) ?? []
-
-  // Sort by batch name, then first name within each batch
-  return students.sort((a, b) => {
+  const { data: activeData } = await query
+  const active = ((activeData as Student[]) ?? []).sort((a, b) => {
     const batchA = a.batches?.name ?? 'zzz'
     const batchB = b.batches?.name ?? 'zzz'
     if (batchA !== batchB) return batchA.localeCompare(batchB)
     return a.first_name.localeCompare(b.first_name)
   })
+
+  // Inactive students — not affected by filters
+  const { data: inactiveData } = await supabase
+    .from('students')
+    .select('*, batches(id, name, class_type)')
+    .eq('is_active', false)
+    .order('first_name')
+
+  const inactive = (inactiveData as Student[]) ?? []
+
+  return { active, inactive }
 }
 
 export default async function StudentsPage({
@@ -52,7 +61,7 @@ export default async function StudentsPage({
   searchParams: Promise<SearchParams>
 }) {
   const params = await searchParams
-  const students = await getStudents(params)
+  const { active: students, inactive: inactiveStudents } = await getStudents(params)
   const hasFilters = !!(params.search || params.class_type || params.fee_status)
 
   // Group students by batch
@@ -135,6 +144,8 @@ export default async function StudentsPage({
           ))}
         </div>
       )}
+
+      <InactiveStudentsSection students={inactiveStudents} />
     </div>
   )
 }
