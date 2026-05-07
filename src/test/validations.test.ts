@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { studentSchema } from '@/lib/validations'
+import { studentSchema, batchSchema } from '@/lib/validations'
 
 // A minimal valid student object used as the base for all tests below.
 // Individual tests override specific fields to check what happens when they're wrong.
@@ -64,5 +64,70 @@ describe('studentSchema', () => {
       const result = studentSchema.safeParse({ ...validStudent, fee_status: status })
       expect(result.success).toBe(true)
     }
+  })
+})
+
+// Tests for batchSchema — the Zod schema that validates the Add/Edit Batch form
+describe('batchSchema', () => {
+  // A minimal valid batch — all required fields present and correct
+  const validBatch = {
+    name: 'Morning Grammar',
+    schedule: 'Mon, Wed, Fri — 9:00 AM',
+    class_type: 'Academic Grammar' as const,
+    max_seats: 20,
+    is_active: true,
+  }
+
+  // The base valid batch should pass without any errors
+  it('passes when all required fields are valid', () => {
+    const result = batchSchema.safeParse(validBatch)
+    expect(result.success).toBe(true)
+  })
+
+  // Batch name is required — an empty string should fail with the correct message
+  it('fails when batch name is empty', () => {
+    const result = batchSchema.safeParse({ ...validBatch, name: '' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe('Batch name is required')
+  })
+
+  // Schedule is required — an empty string should fail with the correct message
+  it('fails when schedule is empty', () => {
+    const result = batchSchema.safeParse({ ...validBatch, schedule: '' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe('Schedule is required')
+  })
+
+  // class_type must be one of the 5 exact program names — anything else is rejected
+  it('fails when class type is not one of the five allowed programs', () => {
+    const result = batchSchema.safeParse({ ...validBatch, class_type: 'Random Program' })
+    expect(result.success).toBe(false)
+  })
+
+  // All 5 program types should be accepted — tests each one individually
+  it('passes for all five valid class types', () => {
+    const types = [
+      'Academic Grammar',
+      'Phonics for Kids',
+      'Phonics for Adults',
+      'Spoken English for Adults',
+      'Language Classes for Kids',
+    ] as const
+    for (const class_type of types) {
+      const result = batchSchema.safeParse({ ...validBatch, class_type })
+      expect(result.success).toBe(true)
+    }
+  })
+
+  // max_seats must be a positive number — zero should be rejected
+  it('fails when max seats is zero', () => {
+    const result = batchSchema.safeParse({ ...validBatch, max_seats: 0 })
+    expect(result.success).toBe(false)
+  })
+
+  // max_seats must be a positive number — negative values should be rejected
+  it('fails when max seats is negative', () => {
+    const result = batchSchema.safeParse({ ...validBatch, max_seats: -5 })
+    expect(result.success).toBe(false)
   })
 })

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getInitials, whatsappLink, formatCurrency } from '@/lib/utils'
+import { getInitials, whatsappLink, formatCurrency, formatDate } from '@/lib/utils'
 
 // Tests for getInitials — takes a first and last name, returns two uppercase initials
 describe('getInitials', () => {
@@ -67,5 +67,28 @@ describe('formatCurrency', () => {
   // Decimal values should be rounded off since maximumFractionDigits is set to 0
   it('rounds off decimal values', () => {
     expect(formatCurrency(999.99)).toBe('₹1,000')
+  })
+})
+
+// Tests for formatDate — takes an ISO date string and returns a human-readable Indian format
+describe('formatDate', () => {
+  // A standard date should be formatted as DD Mon YYYY
+  it('formats a date string into a readable format', () => {
+    expect(formatDate('2024-01-15')).toBe('15 Jan 2024')
+  })
+
+  // Month names should appear in short form (Jan, Feb, Mar etc.)
+  it('uses short month names', () => {
+    expect(formatDate('2024-06-01')).toBe('01 Jun 2024')
+  })
+
+  // Day should always be two digits — single digit days should have a leading zero
+  it('pads single digit days with a leading zero', () => {
+    expect(formatDate('2024-03-05')).toBe('05 Mar 2024')
+  })
+
+  // Year should always appear in full four digit format
+  it('shows the full four digit year', () => {
+    expect(formatDate('2025-12-31')).toBe('31 Dec 2025')
   })
 })
