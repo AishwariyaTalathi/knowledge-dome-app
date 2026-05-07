@@ -1,6 +1,6 @@
-# Minakshi's Knowledge Dome
+# Knowledge Dome
 
-A full-stack web application for Minakshi Talathi's English teaching class in Pune, India. Built to help manage students, batches, attendance, and fees — with a public-facing landing page for prospective students and parents.
+A full-stack web application for an English teaching class in Pune, India. Built to help manage students, batches, attendance, and fees — with a public-facing landing page for prospective students and parents.
 
 ---
 
@@ -9,17 +9,36 @@ A full-stack web application for Minakshi Talathi's English teaching class in Pu
 **Public landing page** — visible to anyone without login:
 - Hero section with enrollment CTA
 - Live class stats (active students, batches, average attendance)
-- Program listings with schedule and seat availability
+- Program listings in a card grid with schedule and seat availability
 - About the teacher section with photo gallery
-- Real parent testimonials
-- Contact details and WhatsApp link
+- Parent testimonials
+- Contact details with WhatsApp and Instagram links
+- Announcements section (pulled from the admin panel)
 
-**Admin dashboard** — accessible only to Minakshi after login:
+**Admin dashboard** — accessible only after login:
+- Actionable overview: students with low attendance, fee issues, and today's attendance count
+- Quick links to mark attendance, add students, and post announcements
+
+**Students:**
 - Add, view, edit, and deactivate students
-- Track fee status (Paid / Pending / Overdue) with visual highlights
-- Monitor attendance per student (last 20 classes as dots + overall percentage bar)
-- Manage batches across 5 program types
-- Post and hide announcements that appear on the landing page
+- Fee status (Paid / Pending / Overdue) updatable directly from the student list — no need to open the edit form
+- Attendance history shown as dots (last 20 classes) + overall percentage on the student profile
+- WhatsApp and phone call buttons with confirmation dialogs before dialling
+
+**Attendance:**
+- Mark attendance per student per day with auto-save on tap
+- Today / Yesterday quick buttons + custom date picker
+- Filter by program type
+- Students grouped by batch with per-group present count
+- Summary tab showing all students sorted by attendance percentage (colour-coded: red below 75%, amber 75–90%, green 90%+)
+
+**Batches:**
+- Create and edit batches across 5 program types
+- Seat count tracked automatically
+
+**Announcements:**
+- Post, edit, show, and hide announcements
+- Active announcements appear on the public landing page automatically
 
 ---
 
@@ -39,7 +58,7 @@ A full-stack web application for Minakshi Talathi's English teaching class in Pu
 
 - **Next.js 16** — App Router, TypeScript, Server Components, Server Actions
 - **Supabase** — PostgreSQL database + authentication
-- **Tailwind CSS v4** — utility-first styling with custom brand colors
+- **Tailwind CSS v4** — utility-first styling with custom brand colors via `@theme` in `globals.css`
 - **react-hook-form + zod** — form validation
 - **Lucide React** — icons
 - **Vercel** — hosting
@@ -65,12 +84,3 @@ A full-stack web application for Minakshi Talathi's English teaching class in Pu
    npm run dev
    ```
 7. Open [http://localhost:3000](http://localhost:3000)
-
----
-
-## Contact
-
-**Minakshi's Knowledge Dome** · Pune, Maharashtra, India  
-Phone: +91 96045 55029  
-Email: minakshisknowledgedome@gmail.com  
-Instagram: [@knowledgedome](https://www.instagram.com/knowledgedome/)
