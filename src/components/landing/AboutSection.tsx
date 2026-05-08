@@ -92,14 +92,14 @@ export function AboutSection() {
             {GALLERY.map((photo) => (
               <div
                 key={photo.src}
-                className="relative flex-shrink-0 w-[75vw] aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 snap-start"
+                className="relative flex-shrink-0 w-[90vw] aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 snap-start"
               >
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   fill
                   className="object-cover"
-                  sizes="75vw"
+                  sizes="90vw"
                 />
               </div>
             ))}
