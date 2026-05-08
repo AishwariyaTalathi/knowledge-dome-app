@@ -1,5 +1,7 @@
 # Knowledge Dome
 
+**Live demo:** [knowledge-dome-app.vercel.app](https://knowledge-dome-app.vercel.app)
+
 A full-stack web application for an English teaching class in Pune, India. Built to help manage students, batches, attendance, and fees — with a public-facing landing page for prospective students and parents.
 
 ---
