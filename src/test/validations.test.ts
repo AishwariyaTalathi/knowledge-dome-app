@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { studentSchema, batchSchema } from '@/lib/validations'
+import { studentSchema, batchSchema, testimonialSchema } from '@/lib/validations'
 
 // A minimal valid student object used as the base for all tests below.
 // Individual tests override specific fields to check what happens when they're wrong.
@@ -129,5 +129,70 @@ describe('batchSchema', () => {
   it('fails when max seats is negative', () => {
     const result = batchSchema.safeParse({ ...validBatch, max_seats: -5 })
     expect(result.success).toBe(false)
+  })
+})
+
+// Tests for testimonialSchema — the Zod schema that validates the Add/Edit Testimonial form
+describe('testimonialSchema', () => {
+  // A minimal valid testimonial — all required fields present and correct
+  const validTestimonial = {
+    name: 'Mrs. Phadnis',
+    role: 'Parent',
+    quote: 'My kid showed a lot of improvement after joining the class.',
+    stars: 5,
+    is_active: true,
+  }
+
+  // The base valid testimonial should pass without any errors
+  it('passes when all required fields are valid', () => {
+    const result = testimonialSchema.safeParse(validTestimonial)
+    expect(result.success).toBe(true)
+  })
+
+  // Name is required — an empty string should fail with the correct message
+  it('fails when name is empty', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, name: '' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe('Name is required')
+  })
+
+  // Role is required — an empty string should fail with the correct message
+  it('fails when role is empty', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, role: '' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe('Role is required')
+  })
+
+  // Quote must be at least 10 characters — a very short string should be rejected
+  it('fails when quote is shorter than 10 characters', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, quote: 'Too short' })
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0].message).toBe('Quote must be at least 10 characters')
+  })
+
+  // Stars must be between 1 and 5 — 0 should be rejected
+  it('fails when stars is 0', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, stars: 0 })
+    expect(result.success).toBe(false)
+  })
+
+  // Stars must be between 1 and 5 — 6 should be rejected
+  it('fails when stars is greater than 5', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, stars: 6 })
+    expect(result.success).toBe(false)
+  })
+
+  // All star values from 1 to 5 should be accepted
+  it('passes for all valid star ratings (1 through 5)', () => {
+    for (const stars of [1, 2, 3, 4, 5]) {
+      const result = testimonialSchema.safeParse({ ...validTestimonial, stars })
+      expect(result.success).toBe(true)
+    }
+  })
+
+  // is_active controls visibility — both true and false should be valid
+  it('passes when is_active is false (hidden testimonial)', () => {
+    const result = testimonialSchema.safeParse({ ...validTestimonial, is_active: false })
+    expect(result.success).toBe(true)
   })
 })
