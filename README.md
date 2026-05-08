@@ -57,12 +57,13 @@ A full-stack web application for an English teaching class in Pune, India. Built
 
 ## Tech stack
 
-- **Next.js 16** — App Router, TypeScript, Server Components, Server Actions
-- **Supabase** — PostgreSQL database + authentication
-- **Tailwind CSS v4** — utility-first styling with custom brand colors via `@theme` in `globals.css`
-- **react-hook-form + zod** — form validation
-- **Lucide React** — icons
-- **Vercel** — hosting
+| Technology | Why we chose it |
+|---|---|
+| **Next.js 16 (App Router)** | Server Components let data fetching happen on the server — the browser never talks to the database directly. Server Actions replace a traditional REST API for mutations, keeping the codebase simpler. TypeScript catches bugs at compile time rather than in production. |
+| **Supabase** | Managed PostgreSQL with built-in authentication and Row Level Security. No need to build auth from scratch or run a separate auth service. The free tier handles a class of ~200 students comfortably, and RLS policies enforce access control at the database level as a safety net independent of application code. |
+| **Tailwind CSS v4** | Utility-first classes keep styling co-located with markup, which is faster to iterate on than separate CSS files. v4's `@theme {}` block in `globals.css` replaces the config file entirely, reducing boilerplate. |
+| **react-hook-form + Zod** | react-hook-form has minimal re-renders and excellent TypeScript support. Zod schemas are defined once in `src/lib/validations.ts` and reused on both the client (for instant inline errors) and the server (in Server Actions), so validation logic is never duplicated. |
+| **Vercel** | Zero-configuration deployment for Next.js. Every push to `main` triggers an automatic build and deployment. Environment variables are managed securely in the Vercel dashboard, never in source code. |
 
 ---
 
@@ -85,6 +86,44 @@ A full-stack web application for an English teaching class in Pune, India. Built
    npm run dev
    ```
 7. Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                  # Public landing page (/)
+│   ├── login/page.tsx            # Login page
+│   └── (protected)/              # All routes behind auth middleware
+│       ├── dashboard/page.tsx
+│       ├── students/             # List, new, [id] detail, [id]/edit
+│       ├── batches/page.tsx
+│       ├── announcements/page.tsx
+│       └── attendance/page.tsx
+├── components/
+│   ├── ui/                       # Reusable primitives (Button, Input, Modal…)
+│   ├── layout/                   # Sidebar, MobileNav, TopBar
+│   ├── landing/                  # Landing page sections
+│   ├── students/                 # StudentTable, StudentCard, FeeStatusButton…
+│   ├── batches/                  # BatchModal
+│   ├── announcements/            # AnnouncementModal
+│   └── attendance/               # AttendanceMarker, AttendanceSummary
+├── lib/
+│   ├── supabase/                 # Browser, server, and middleware clients
+│   ├── constants.ts              # Class types, grades, fee statuses
+│   ├── validations.ts            # Zod schemas shared across client and server
+│   └── utils.ts                  # cn(), whatsappLink(), formatDate()…
+└── types/database.ts             # TypeScript types for all DB tables
+
+supabase/
+├── schema.sql                    # Table definitions, RLS policies, triggers
+└── seed.sql                      # Sample batches, students, announcements
+
+e2e/                              # Playwright end-to-end tests
+src/test/                         # Vitest unit and component tests
+```
 
 ---
 
