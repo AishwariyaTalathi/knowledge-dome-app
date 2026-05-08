@@ -13,7 +13,7 @@ export const revalidate = 60
 export default async function LandingPage() {
   const supabase = await createClient()
 
-  const [{ data: batches }, { data: announcements }, { data: students }] = await Promise.all([
+  const [{ data: batches }, { data: announcements }, { data: students }, { data: testimonials }] = await Promise.all([
     supabase.from('batches').select('*').eq('is_active', true).order('created_at'),
     supabase
       .from('announcements')
@@ -22,6 +22,7 @@ export default async function LandingPage() {
       .order('date', { ascending: false })
       .limit(5),
     supabase.from('students').select('id, attendance_pct, enrollment_date').eq('is_active', true),
+    supabase.from('testimonials').select('*').eq('is_active', true).order('created_at'),
   ])
 
   const activeStudents = students?.length ?? 0
@@ -55,7 +56,7 @@ export default async function LandingPage() {
 
       <BatchList batches={batches ?? []} />
 
-      <TestimonialsSection />
+      <TestimonialsSection testimonials={testimonials ?? []} />
 
       <AnnouncementsSection announcements={announcements ?? []} />
 

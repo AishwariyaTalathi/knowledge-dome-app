@@ -55,3 +55,13 @@ export interface Announcement {
   is_active: boolean
   created_at: string
 }
+
+export interface Testimonial {
+  id: string
+  name: string
+  role: string
+  quote: string
+  stars: number
+  is_active: boolean
+  created_at: string
+}

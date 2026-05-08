@@ -12,5 +12,6 @@ export const config = {
     '/batches/:path*',
     '/announcements/:path*',
     '/attendance/:path*',
+    '/testimonials/:path*',
   ],
 }

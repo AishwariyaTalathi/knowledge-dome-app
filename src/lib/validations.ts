@@ -43,3 +43,13 @@ export const announcementSchema = z.object({
 })
 
 export type AnnouncementFormData = z.infer<typeof announcementSchema>
+
+export const testimonialSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  role: z.string().min(1, 'Role is required'),
+  quote: z.string().min(10, 'Quote must be at least 10 characters'),
+  stars: z.coerce.number().int().min(1).max(5),
+  is_active: z.boolean(),
+})
+
+export type TestimonialFormData = z.infer<typeof testimonialSchema>
