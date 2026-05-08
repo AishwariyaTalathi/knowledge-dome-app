@@ -19,3 +19,12 @@ export async function updateBatch(id: string, data: BatchFormData): Promise<{ er
   revalidatePath('/batches')
   return {}
 }
+
+export async function deleteBatch(id: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { error } = await supabase.from('batches').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/batches')
+  revalidatePath('/students')
+  return {}
+}

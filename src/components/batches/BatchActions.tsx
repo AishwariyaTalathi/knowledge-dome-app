@@ -2,16 +2,19 @@
 
 import { useState } from 'react'
 import { Plus, BookOpen } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { BatchModal } from './BatchModal'
-import { createBatch, updateBatch } from '@/app/(protected)/batches/actions'
+import { createBatch, updateBatch, deleteBatch } from '@/app/(protected)/batches/actions'
 import type { Batch } from '@/types/database'
 import type { BatchFormData } from '@/lib/validations'
 
 export function BatchActions({ batches }: { batches: Batch[] }) {
   const [addOpen, setAddOpen] = useState(false)
   const [editBatch, setEditBatch] = useState<Batch | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Batch | null>(null)
 
   const handleAdd = async (data: BatchFormData) => {
     const result = await createBatch(data)
@@ -25,6 +28,23 @@ export function BatchActions({ batches }: { batches: Batch[] }) {
     if (!result.error) setEditBatch(null)
     return result
   }
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    const result = await deleteBatch(deleteTarget.id)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success(`"${deleteTarget.name}" deleted`)
+    }
+    setDeleteTarget(null)
+  }
+
+  const deleteMessage = deleteTarget
+    ? deleteTarget.current_count > 0
+      ? `${deleteTarget.current_count} student${deleteTarget.current_count === 1 ? '' : 's'} will be unassigned but not deleted. You can reassign them afterwards.`
+      : 'This batch has no students. It will be permanently removed.'
+    : ''
 
   return (
     <div>
@@ -60,9 +80,14 @@ export function BatchActions({ batches }: { batches: Batch[] }) {
                 {batch.current_count}/{batch.max_seats} seats filled
               </p>
             </div>
-            <Button variant="secondary" size="sm" onClick={() => setEditBatch(batch)}>
-              Edit
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setEditBatch(batch)}>
+                Edit
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(batch)}>
+                Delete
+              </Button>
+            </div>
           </div>
         ))}
         {batches.length === 0 && (
@@ -84,6 +109,16 @@ export function BatchActions({ batches }: { batches: Batch[] }) {
           onSubmit={handleEdit}
         />
       )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={`Delete "${deleteTarget?.name}"?`}
+        message={deleteMessage}
+        confirmLabel="Yes, delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

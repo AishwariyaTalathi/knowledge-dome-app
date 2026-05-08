@@ -43,7 +43,7 @@ const inactiveStudents: Student[] = [
     fee_amount: null,
     notes: null,
     created_at: '2024-01-01',
-    batches: null,
+    batches: undefined,
   },
 ]
 
