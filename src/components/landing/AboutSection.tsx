@@ -87,7 +87,24 @@ export function AboutSection() {
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
             From the classroom
           </p>
-          <div className="grid grid-cols-3 gap-2 md:gap-3">
+          {/* Mobile: horizontal scroll strip. Desktop: 3-column grid */}
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 md:hidden">
+            {GALLERY.map((photo) => (
+              <div
+                key={photo.src}
+                className="relative flex-shrink-0 w-[75vw] aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 snap-start"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  className="object-cover"
+                  sizes="75vw"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:grid grid-cols-3 gap-3">
             {GALLERY.map((photo) => (
               <GalleryCard key={photo.src} src={photo.src} alt={photo.alt} />
             ))}
