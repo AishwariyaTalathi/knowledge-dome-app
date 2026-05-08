@@ -88,21 +88,35 @@ export function AboutSection() {
             From the classroom
           </p>
           {/* Mobile: horizontal scroll strip. Desktop: 3-column grid */}
-          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 md:hidden">
-            {GALLERY.map((photo) => (
-              <div
-                key={photo.src}
-                className="relative flex-shrink-0 w-[90vw] aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 snap-start"
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  className="object-cover"
-                  sizes="90vw"
-                />
+          <div className="md:hidden">
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
+              {GALLERY.map((photo) => (
+                <div
+                  key={photo.src}
+                  className="relative flex-shrink-0 w-[90vw] aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200 snap-start"
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    className="object-cover"
+                    sizes="90vw"
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Dot indicators + swipe hint */}
+            <div className="flex items-center justify-between mt-3 px-1">
+              <div className="flex gap-1.5">
+                {GALLERY.map((photo, i) => (
+                  <div
+                    key={photo.src}
+                    className={`rounded-full transition-all ${i === 0 ? 'w-4 h-1.5 bg-brand-800' : 'w-1.5 h-1.5 bg-gray-300'}`}
+                  />
+                ))}
               </div>
-            ))}
+              <p className="text-xs text-gray-400">Swipe for more →</p>
+            </div>
           </div>
           <div className="hidden md:grid grid-cols-3 gap-3">
             {GALLERY.map((photo) => (
