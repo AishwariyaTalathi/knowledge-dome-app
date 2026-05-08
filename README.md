@@ -24,6 +24,7 @@ A full-stack web application for an English teaching class in Pune, India. Built
 - Fee status (Paid / Pending / Overdue) updatable directly from the student list — no need to open the edit form
 - Attendance history shown as dots (last 20 classes) + overall percentage on the student profile
 - WhatsApp and phone call buttons with confirmation dialogs before dialling
+- Inactive students shown in a separate collapsible section
 
 **Attendance:**
 - Mark attendance per student per day with auto-save on tap
@@ -84,3 +85,75 @@ A full-stack web application for an English teaching class in Pune, India. Built
    npm run dev
    ```
 7. Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## Testing
+
+The project has two layers of automated tests.
+
+**Unit & component tests (Vitest)**
+```bash
+npm test
+```
+Covers utility functions (`getInitials`, `whatsappLink`, `formatCurrency`, `formatDate`), Zod validation schemas (student and batch forms), and interactive components (`FeeStatusButton`, `WhatsAppButton`, `InactiveStudentsSection`).
+
+**End-to-end tests (Playwright)**
+```bash
+npm run e2e          # headless
+npm run e2e:headed   # watch in browser
+npx playwright test --ui  # interactive UI mode with step-by-step replay
+```
+Requires the dev server running (`npm run dev`) and a test user created in Supabase. Credentials are stored in `.env.test` (gitignored). Covers the login flow, adding a student, updating fee status, and marking attendance.
+
+---
+
+## Built with Claude Code
+
+This project was built end-to-end using [Claude Code](https://claude.ai/code) — Anthropic's AI coding assistant — as a showcase of how AI-assisted development can produce a production-ready application with real security, validation, and test coverage.
+
+Here is a concise walkthrough of how the project was created.
+
+### 1. Planning and architecture
+Claude Code started by producing a detailed build plan covering the database schema, file structure, component hierarchy, and data-flow architecture before a single line of code was written. Key decisions — such as keeping all Supabase calls in Server Components, mutations in Server Actions only, and Client Components used only for interactivity — were defined upfront and followed throughout.
+
+### 2. Database design
+The schema was designed in `supabase/schema.sql` with four tables (`batches`, `students`, `attendance_records`, `announcements`) and Row Level Security (RLS) policies to control access:
+- `batches` and active `announcements` are publicly readable (for the landing page)
+- All other tables require an authenticated session
+- A trigger automatically keeps `batches.current_count` in sync
+
+### 3. Authentication and route protection
+A Next.js middleware file guards all protected routes (`/dashboard`, `/students`, `/batches`, `/attendance`, `/announcements`). Unauthenticated requests are redirected to `/login`. The admin account is created manually in the Supabase dashboard — there is no self-signup, which eliminates an entire class of unauthorised access.
+
+### 4. Building features incrementally
+Features were built one at a time in a deliberate order: shared UI components → layout → landing page → login → dashboard → students → attendance → batches → announcements. Each feature was tested in the browser before moving on.
+
+### 5. Form validation
+Every form uses a Zod schema defined in `src/lib/validations.ts`. Schemas are shared between the client-side react-hook-form resolver (for instant inline errors) and server-side validation in Server Actions, so invalid data is rejected at both layers.
+
+### 6. Security practices
+- **No credentials in source code** — Supabase URL and key are environment variables; `.env*` files are gitignored
+- **Server Actions for all mutations** — the browser never calls the database directly
+- **RLS policies** — enforced at the database level regardless of application logic
+- **Confirmation dialogs** — WhatsApp and phone call buttons require an explicit confirmation before opening, preventing accidental dials
+- **Error boundary** — a `error.tsx` file catches unexpected server errors on all protected routes
+
+### 7. Code quality improvements
+After the initial build, several improvements were made in response to review:
+- Replaced `as any` casts with proper TypeScript types
+- Standardised all mutations to use Server Actions with `revalidatePath()`
+- Added loading skeletons for pages that fetch data
+- Added an error boundary for the protected route group
+
+### 8. Unit and component testing (Vitest)
+A Vitest test suite was added covering:
+- **Utility functions** — 16 tests across `getInitials`, `whatsappLink`, `formatCurrency`, `formatDate`
+- **Zod schemas** — 15 tests verifying valid inputs pass and invalid inputs are rejected with the right messages
+- **React components** — component tests for `FeeStatusButton`, `WhatsAppButton`, and `InactiveStudentsSection` using React Testing Library and `vi.mock` to stub server actions
+
+### 9. End-to-end testing (Playwright)
+A Playwright E2E suite was added with 11 tests across 3 spec files. Tests run sequentially (single worker) to avoid concurrent Supabase auth issues. Test credentials are stored in a gitignored `.env.test` file and loaded at runtime — no secrets are committed to the repository. The Playwright UI mode (`npx playwright test --ui`) provides a step-by-step visual replay of every action.
+
+### 10. Deployment
+The app is deployed to Vercel with environment variables set in the Vercel dashboard. Every push to `main` triggers an automatic deployment.
