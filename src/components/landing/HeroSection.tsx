@@ -1,10 +1,12 @@
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 
+const COURSE_PILLS = ['Phonics', 'Grammar', 'Spoken English', 'Kids & Adults']
+
 export function HeroSection() {
   return (
     <section
-      className="relative text-white pt-10 pb-24 px-4 overflow-hidden"
+      className="relative text-white overflow-hidden"
       style={{
         background: `
           radial-gradient(ellipse at 15% 50%, rgba(30, 136, 229, 0.5) 0%, transparent 55%),
@@ -14,7 +16,7 @@ export function HeroSection() {
         `,
       }}
     >
-      {/* Dot pattern */}
+      {/* Dot pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.06]"
         style={{
@@ -23,42 +25,83 @@ export function HeroSection() {
         }}
       />
 
-      <div className="relative max-w-2xl mx-auto text-center flex flex-col items-center">
-        {/* Logo */}
-        <div className="w-28 h-28 rounded-full bg-white shadow-xl mb-4 ring-2 ring-white/30 overflow-hidden flex-shrink-0">
-          <Image
-            src="/images/logo.png"
-            alt="Minakshi's Knowledge Dome"
-            width={112}
-            height={112}
-            priority
-            className="rounded-full"
-          />
+      <div className="relative max-w-5xl mx-auto px-6 pt-10 pb-24 grid md:grid-cols-2 gap-10 items-center">
+
+        {/* Left — text content */}
+        <div className="text-center md:text-left order-2 md:order-1">
+          {/* Enrolling badge */}
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1 text-xs font-medium text-white/80 mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
+            Enrolling Now · Pune, Maharashtra
+          </div>
+
+          <h1 className="text-3xl md:text-5xl font-bold italic mb-3 leading-tight">
+            Minakshi&apos;s<br />Knowledge Dome
+          </h1>
+
+          <p className="text-blue-200 text-sm md:text-base mb-6 font-sans not-italic leading-relaxed max-w-sm mx-auto md:mx-0">
+            Building confident communicators, one student at a time.
+          </p>
+
+          {/* Course pills */}
+          <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-8">
+            {COURSE_PILLS.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs font-medium bg-white/10 border border-white/25 rounded-full px-3 py-1 text-white/90"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* CTAs */}
+          <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 bg-white text-brand-800 font-semibold px-6 py-2.5 rounded-full hover:bg-blue-50 transition-colors shadow-md text-sm"
+            >
+              Enroll Now
+              <ArrowRight size={15} />
+            </a>
+            <a
+              href="#classes"
+              className="inline-flex items-center gap-2 bg-white/10 border border-white/25 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/20 transition-colors text-sm"
+            >
+              View Classes
+            </a>
+          </div>
         </div>
 
-        {/* Pill badge */}
-        <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1 text-xs font-medium text-white/80 mb-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
-          Enrolling Now · Pune, Maharashtra
+        {/* Right — teacher photo with floating cards */}
+        <div className="order-1 md:order-2 flex justify-center">
+          <div className="relative">
+            {/* Soft glow behind photo */}
+            <div className="absolute inset-4 bg-blue-300/20 rounded-3xl blur-2xl" />
+
+            {/* Photo */}
+            <div className="relative w-52 h-64 md:w-72 md:h-96 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl">
+              <Image
+                src="/images/teacher.jpg"
+                alt="Minakshi Talathi — English Language Educator"
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 768px) 208px, 288px"
+                priority
+              />
+            </div>
+
+            {/* Floating credential — top right */}
+            <div className="absolute -top-3 -right-4 bg-white rounded-2xl shadow-lg px-3 py-2 text-xs font-semibold text-brand-800 whitespace-nowrap">
+              ✓ Jolly Phonics Certified
+            </div>
+
+            {/* Floating credential — bottom left */}
+            <div className="absolute -bottom-3 -left-4 bg-white rounded-2xl shadow-lg px-3 py-2 text-xs font-semibold text-brand-800 whitespace-nowrap">
+              🎓 20+ Years Experience
+            </div>
+          </div>
         </div>
-
-        <h1 className="text-2xl md:text-4xl font-bold italic mb-2 leading-tight">
-          Minakshi&apos;s Knowledge Dome
-        </h1>
-        <p className="text-brand-200 text-sm md:text-base mb-2 font-sans not-italic">
-          Building confident communicators, one student at a time.
-        </p>
-        <p className="text-brand-300/80 text-xs mb-5 font-sans tracking-widest uppercase">
-          Phonics · Grammar · Spoken English · Kids &amp; Adults
-        </p>
-
-        <a
-          href="#contact"
-          className="inline-flex items-center gap-2 bg-white text-brand-800 font-semibold px-6 py-2.5 rounded-full hover:bg-brand-50 transition-colors shadow-md text-sm"
-        >
-          Enroll Now
-          <ArrowRight size={15} />
-        </a>
       </div>
 
       {/* Wave divider */}
