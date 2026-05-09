@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { HeroSection } from '@/components/landing/HeroSection'
 import { StatsRow } from '@/components/landing/StatsRow'
+import { StickyNav } from '@/components/landing/StickyNav'
 import { AboutSection } from '@/components/landing/AboutSection'
 import { BatchList } from '@/components/landing/BatchList'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
@@ -52,15 +53,13 @@ export default async function LandingPage() {
         newEnrollments={newEnrollments}
       />
 
-      <AboutSection />
+      <StickyNav />
 
-      <BatchList batches={batches ?? []} />
-
-      <TestimonialsSection testimonials={testimonials ?? []} />
-
-      <AnnouncementsSection announcements={announcements ?? []} />
-
-      <ContactSection />
+      <div id="about"><AboutSection /></div>
+      <div id="classes"><BatchList batches={batches ?? []} /></div>
+      <div id="reviews"><TestimonialsSection testimonials={testimonials ?? []} /></div>
+      <div id="announcements"><AnnouncementsSection announcements={announcements ?? []} /></div>
+      <div id="contact"><ContactSection /></div>
 
       <footer className="text-center py-8 text-sm text-gray-400 border-t border-gray-200">
         <p>© {new Date().getFullYear()} Minakshi&apos;s Knowledge Dome · Pune</p>

@@ -14,6 +14,10 @@
   --font-display: var(--font-playfair);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: #f8fafc;
   color: #171717;
@@ -21,4 +25,9 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-playfair);
+}
+
+/* Offset anchor targets so sticky nav doesn't cover the section heading */
+[id] {
+  scroll-margin-top: 56px;
 }
